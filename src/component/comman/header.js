@@ -91,7 +91,7 @@ const Header = () => {
                 }`}
                 aria-current="page"
               >
-                Property
+                Units
               </NavLink>
             </li>
             <li>

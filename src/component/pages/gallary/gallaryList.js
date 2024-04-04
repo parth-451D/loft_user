@@ -78,7 +78,7 @@ const GallaryList = () => {
             <p>Gallery</p>
           </div>
           <div class="flex overflow-x-scroll items-center justify-center">
-            <ul class="flex flex-nowrap overflow-x-auto text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+            <ul class="flex flex-nowrap overflow-x-auto text-sm font-medium text-center text-gray-500 dark:text-gray-400 mt-5">
               <li class="me-2">
                 <a
                   className={`inline-block px-4 py-3 rounded-lg ${

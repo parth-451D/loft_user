@@ -288,6 +288,7 @@ input.react-datepicker-ignore-onclickoutside {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 400px;
 }
 
 .property-box {
@@ -323,7 +324,7 @@ input.react-datepicker-ignore-onclickoutside {
   border-radius: 16px;
   border: 1px solid var(--font, #555);
   padding: 20px;
-  width: 150px;
+  width: 20rem;
 }
 
 .payment-info {
@@ -367,7 +368,7 @@ textarea.text-area {
 
 .contact-line {
   border-left: 2px solid #1c445f;
-  width: 120px;
+  width: 160px;
   height: 90px;
 }
 
@@ -700,4 +701,36 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.image-preview {
+  height: 100px;
+  width: 100px;
+}
+.preview-container {
+  position: relative;
+  width: 100px;
+}
+
+.aminites-card {
+  background: linear-gradient(
+    119.17deg,
+    #b0b0b0 1.14%,
+    rgba(175, 175, 175, 0.1) 100%
+  );
+  width: 100%;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 35px;
+  font-weight: 600;
+}
+
+.react-responsive-modal-modal {
+  width: 500px;
 }

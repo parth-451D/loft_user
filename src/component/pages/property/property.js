@@ -101,6 +101,9 @@ const Property = () => {
   return (
     <>
       <div className="container mx-auto comman-padding ">
+        <div className="comman-header text-center top">
+          <p>Our Units</p>
+        </div>
         <div className="flex justify-between items-center">
           <div>
             {/* <ul class="flex flex-nowrap overflow-x-auto text-sm font-medium text-center text-gray-500 dark:text-gray-400">
@@ -315,6 +318,11 @@ const Property = () => {
             })}
           </div>
         )}
+        {allUnits?.length === 0 ? (
+          <div className="">
+            <p className="text-center to">No Units found with applied filter</p>
+          </div>
+        ) : null}
       </div>
     </>
   );

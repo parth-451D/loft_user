@@ -67,7 +67,7 @@ const Aminites = () => {
                     navigate("/animites");
                   }}
                 >
-                  View All Facilities
+                  View All Amenities
                 </button>
               </div>
               <div className="col-span-12 lg:col-span-8">

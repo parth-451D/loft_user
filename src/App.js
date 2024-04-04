@@ -74,7 +74,7 @@ const AppContent = () => {
         <Route path="/payment" element={<Payment />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/chat" element={<Chat />} />
+        {/* <Route path="/chat" element={<NewChat />} /> */}
       </Routes>
       <Chat />
       {!isExcludedRoute() && <Footer />}

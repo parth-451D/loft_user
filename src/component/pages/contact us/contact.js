@@ -217,7 +217,7 @@ const Contact = () => {
                 </div>
               </div>
               <div className="contact-line"></div>
-              <div className="flex items-center">
+              <div className="flex items-center" style={{marginRight:"18px"}}>
                 <div className="contact-box flex items-center justify-center">
                   <svg
                     width="50"

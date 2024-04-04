@@ -1,9 +1,140 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Formik } from "formik";
+import axios from "axios";
+import { ErrorAlert, SuccessAlert } from "../../comman/sweetalert";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import INLoader from "../../comman/inLoader";
+import * as Yup from "yup";
 
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const initialValues = {
+    full_name: "",
+    city: "",
+    rating: "",
+    description: "",
+    image: "",
+    number: "",
+    email: "",
+  };
+
+  const addTestimonialSchema = Yup.object().shape({
+    full_name: Yup.string()
+      .required("Full name is required")
+      .min(3, "full name must be 3 characters at minimum")
+      .max(100, "full name more then 100 character"),
+    city: Yup.string()
+      .required("City is required")
+      .min(3, "city must be 3 characters at minimum")
+      .max(100, "city more then 100 character"),
+    rating: Yup.number()
+      .required("Rating is required")
+      .min(1, "Rating must be at least 1")
+      .max(5, "Rating must be at most 5"),
+    description: Yup.string()
+      .required("Description is required")
+      .min(3, "description must be 3 characters at minimum")
+      .max(10000, "description more then 10000 character"),
+    number: Yup.number().required("Number is required").max(5),
+    email: Yup.string()
+      .required("Email is required")
+      .email("Please enter a valid email"),
+  });
+
+  const [images, setImages] = useState([]);
+  const [imagesBuffer, setImagesBuffer] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const onOpenModal = () => setOpen(true);
+  const onCloseModal = () => {
+    setOpen(false);
+    setImages([]);
+    setImagesBuffer([]);
+  };
+
+  const handleImageChange = (e) => {
+    const selectedImages = Array.from(e.target.files);
+    setImagesBuffer(selectedImages);
+    // Display preview for each selected image
+    const imagePreviews = selectedImages.map((image) =>
+      URL.createObjectURL(image)
+    );
+
+    setImages(imagePreviews);
+  };
+
+  const removeImage = (index, e) => {
+    e.preventDefault();
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    setImagesBuffer(droppedFiles);
+    const droppedImagePreviews = droppedFiles.map((file) =>
+      URL.createObjectURL(file)
+    );
+    setImages((prevImages) => [...prevImages, ...droppedImagePreviews]);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const uploadImages = async () => {
+    try {
+      const uploadedUrls = await Promise.all(
+        imagesBuffer.map(async (image) => {
+          const formData = new FormData();
+          formData.append("image", image);
+
+          try {
+            const res = await axios.post(
+              `${process.env.REACT_APP_BASE_URL}/upload`,
+              formData
+            );
+
+            return res.data.result;
+          } catch (error) {
+            console.error("Error uploading image:", error);
+            throw error; // Rethrow error to handle it later
+          }
+        })
+      );
+      return uploadedUrls[0]; // Return the array of uploaded URLs
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      return []; // Return an empty array in case of error
+    }
+  };
+
+  const userTestimonials = async (values) => {
+    setIsLoading(true); // Set isLoading to true before making the API request
+    try {
+      const uploadedUrls = await uploadImages();
+
+      const res = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/webapp/testimonials`,
+        { ...values, image: [uploadedUrls] }
+      );
+
+      if (res.data.code === 200) {
+        SuccessAlert({ title: res.data.msg });
+        onCloseModal();
+      }
+    } catch (error) {
+      ErrorAlert({ title: error?.response?.data?.error });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -89,9 +220,232 @@ const Footer = () => {
                     Contact us
                   </Link>
                 </li>
+                <li className="mb-4 cursor" onClick={onOpenModal}>
+                  <p className="text-white text-sm">Review & Feedback</p>
+                </li>
               </ul>
             </div>
+            <Modal open={open} onClose={onCloseModal} center>
+              <Formik
+                initialValues={initialValues}
+                validationSchema={addTestimonialSchema}
+                onSubmit={(values) => {
+                  userTestimonials(values);
+                }}
+              >
+                {({ values, errors, touched, handleChange, handleSubmit }) => (
+                  <>
+                    <h2 className="text-center" style={{ fontSize: "25px" }}>
+                      Review & Feedback
+                    </h2>
+                    <div className="d-flex ms-5">
+                      <form className="row">
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Full Name</p>
+                            </div>
+                            <input
+                              type="text"
+                              name="full_name"
+                              className="input-box mt-1"
+                              placeholder="Enter full name"
+                              onChange={handleChange}
+                              value={values.full_name}
+                            />
+                            {errors.full_name && touched.full_name && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.full_name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>City</p>
+                            </div>
+                            <input
+                              type="text"
+                              name="city"
+                              className="input-box mt-1"
+                              placeholder="Enter city"
+                              onChange={handleChange}
+                              value={values.city}
+                            />
+                            {errors.city && touched.city && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.city}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Number</p>
+                            </div>
+                            <input
+                              type="number"
+                              name="number"
+                              className="input-box mt-1"
+                              placeholder="Enter number"
+                              onChange={handleChange}
+                              value={values.number}
+                            />
+                            {errors.number && touched.number && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.number}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Email</p>
+                            </div>
+                            <input
+                              type="email"
+                              name="email"
+                              className="input-box mt-1"
+                              placeholder="Enter email"
+                              onChange={handleChange}
+                              value={values.email}
+                            />
+                            {errors.email && touched.email && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.email}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Rating</p>
+                            </div>
+                            <input
+                              type="number"
+                              name="rating"
+                              className="input-box mt-1"
+                              placeholder="Provide Rating"
+                              onChange={handleChange}
+                              value={values.rating}
+                            />
+                            {errors.rating && touched.rating && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.rating}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-12">
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Description</p>
+                            </div>
+                            <input
+                              type="text"
+                              className="input-box mt-1"
+                              placeholder="Description"
+                              name="description"
+                              onChange={handleChange}
+                              value={values.description}
+                            />
+                            {errors.description && touched.description && (
+                              <p className="text-red-600 mt-2 mb-3">
+                                {errors.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
 
+                        <div
+                          className="col-xs-12 col-sm-12 col-md-12"
+                          onDrop={handleDrop}
+                          onDragOver={handleDragOver}
+                        >
+                          <div className="form-group">
+                            <div className="comman-grey">
+                              <p>Profile Picture</p>
+                            </div>
+                            {images.length === 0 && (
+                              <div
+                                style={{
+                                  border: "2px dashed #ccc",
+                                  padding: "20px",
+                                  borderRadius: "5px",
+                                  height: "160px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexDirection: "column",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                <p>
+                                  Drag and drop your images here or click to
+                                  select
+                                </p>
+                                <input
+                                  type="file"
+                                  name="image"
+                                  className="input-box mt-1"
+                                  placeholder="Upload Images"
+                                  onChange={handleImageChange}
+                                />
+                              </div>
+                            )}
+                            <div className="preview-container d-flex align-items-center gap-2 mt-3">
+                              {images.map((image, index) => (
+                                <div key={index} className="preview-container">
+                                  <img
+                                    src={image}
+                                    alt={`Preview ${index}`}
+                                    className="image-preview"
+                                  />
+                                  <button
+                                    className="remove-button"
+                                    onClick={(e) => removeImage(index, e)}
+                                  >
+                                    ❌
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        {isLoading ? (
+                          <INLoader />
+                        ) : (
+                          <div className="mt-3">
+                            <button
+                              type="button"
+                              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 
+                            font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2
+                             dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                              onClick={handleSubmit}
+                            >
+                              Submit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={onCloseModal}
+                              class="focus:outline-none text-white bg-red-700 hover:bg-red-800 
+                            focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5
+                             py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </form>
+                    </div>
+                  </>
+                )}
+              </Formik>
+            </Modal>
             <div>
               <h2 className="mb-6 text-sm  uppercase text-white font-extrabold ">
                 Contact Info

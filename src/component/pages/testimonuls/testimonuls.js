@@ -34,7 +34,7 @@ const Testimonuls = () => {
   return (
     <div className="container mx-auto comman-padding">
       <div className="comman-header text-center top">
-        <p>Testimonuls</p>
+        <p>Testimonials</p>
       </div>
       <div className=" top  test testimonuls-bg ">
         <div className="grid grid-cols-12 gap-4">

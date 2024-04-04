@@ -1,17 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { ErrorAlert } from "../../comman/sweetalert";
 import axios from "axios";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
-  const onOpenModal = () => setOpen(true);
-  const onCloseModal = () => setOpen(false);
+  const [initialQuestions, setInitialQuestions] = useState([]);
+  const [QnA, setQnA] = useState([]);
+
+  const onOpenModal = () => {
+    getChatData();
+    setOpen(true);
+  };
+
+  const onCloseModal = () => {
+    setQnA([]);
+    setInitialQuestions([]);
+    setOpen(false);
+  };
   const [isLoading, setIsLoading] = useState(false);
-  const [chatData, setChatData] = useState([]);
-  const [answer, setAnswer] = useState([]);
-  const [relatedQuestions, setRelatedQuestions] = useState([]);
-  const [chatHistory, setChatHistory] = useState([]);
 
   const getChatData = async () => {
     setIsLoading(true);
@@ -24,8 +31,7 @@ const Chat = () => {
           },
         }
       );
-
-      setChatData(res.data.result);
+      setInitialQuestions(res.data.result);
     } catch (error) {
       ErrorAlert({ title: error?.response?.data?.error });
     } finally {
@@ -33,46 +39,26 @@ const Chat = () => {
     }
   };
 
-  const handleQuestionClick = async (questionId) => {
+  const selectQuestion = async (item) => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/user-chatbot/answer/${questionId}`,
-        {
-          headers: {
-            "ngrok-skip-browser-warning": 0,
-          },
-        }
+        `${process.env.REACT_APP_BASE_URL}/user-chatbot/answer/${item?.id}`
       );
 
       const { answer, relatedQuestionList } = res.data.result;
-      setAnswer(answer);
-      setRelatedQuestions(relatedQuestionList);
-
-      // Append related question to the chat history
-      if (relatedQuestionList.length > 0) {
-        setChatData((prevChatData) => [
-          ...prevChatData,
-          ...relatedQuestionList,
-        ]);
-      }
+      setQnA([...QnA, { question: item?.question, answer: answer }]);
+      setInitialQuestions(relatedQuestionList);
     } catch (error) {
       ErrorAlert({ title: error?.response?.data?.error });
     }
-    //  finally {
-    //   setIsLoading(false);
-    // }
   };
-
-  useEffect(() => {
-    getChatData();
-  }, []);
 
   return (
     <>
-      <Modal open={open} onClose={onCloseModal}>
+      <Modal open={open} onClose={onCloseModal} className="chat-modal">
         <div className="clearfix">
           <div className="chat">
-            <div className="chat-header clearfix">
+            {/* <div className="chat-header clearfix">
               <img
                 src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg"
                 alt="avatar"
@@ -83,82 +69,32 @@ const Chat = () => {
                 <div className="chat-num-messages">already 1 902 messages</div>
               </div>
               <i className="fa fa-star"></i>
-            </div>
-            {/* end chat-header */}
+            </div> */}
             <div className="chat-history">
               <ul>
-                <li>
-                  <div className="message-data">
-                    <span className="message-data-name">
-                      <i className="fa fa-circle online"></i> Vincent
-                    </span>
-                    <span className="message-data-time">10:12 AM, Today</span>
-                  </div>
-                  <div className="message my-message">
-                    Are we meeting today? Project has been already finished and
-                    I have results to show you.
-                  </div>
-                </li>
-
-                {chatData.map((item, index) => (
-                  <li
-                    className="clearfix cursor"
-                    key={index}
-                    onClick={() => handleQuestionClick(item.id)}
-                  >
-                    <div className="message-data align-right">
-                      {/* <span className="message-data-time">10:10 AM, Today</span>{" "} */}
-                    </div>
-                    <div className="message other-message float-right">
-                      {item?.question}
-                    </div>
-                  </li>
-                ))}
-
-                {answer && (
-                  <li>
-                    <div className="message-data">
-                      {/* <span className="message-data-name">
-                        <i className="fa fa-circle online"></i> Vincent
-                      </span>
-                      <span className="message-data-time">10:20 AM, Today</span> */}
-                    </div>
-                    <div className="message my-message">{answer}</div>
-                  </li>
-                )}
-
-                {relatedQuestions.map((item, index) => (
-                  <li
-                    className="clearfix cursor"
-                    key={index}
-                    onClick={() => handleQuestionClick(item.id)}
-                  >
-                    <div className="message-data align-right">
-                      {/* <span className="message-data-time">10:10 AM, Today</span>{" "} */}
-                    </div>
-                    <div className="message other-message float-right">
-                      {item?.question}
-                    </div>
-                  </li>
-                ))}
-                {/* 
-                <li>
-                  <div className="message-data">
-                    <span className="message-data-name">
-                      <i className="fa fa-circle online"></i> Vincent
-                    </span>
-                    <span className="message-data-time">10:31 AM, Today</span>
-                  </div>
-                  <i className="fa fa-circle online"></i>
-                  <i
-                    className="fa fa-circle online"
-                    style={{ color: "#AED2A6" }}
-                  ></i>
-                  <i
-                    className="fa fa-circle online"
-                    style={{ color: "#DAE9DA" }}
-                  ></i>
-                </li> */}
+                {QnA &&
+                  QnA.map((item, index) => (
+                    <>
+                    {/* question right */}
+                      <li className="clearfix" key={index}>
+                        <div className="message-data align-right"></div>
+                        <div className="message other-message float-right">
+                          {item?.question}
+                        </div>
+                      </li>
+                      {/* answer left */}
+                      <li>
+                        <div className="message my-message">{item.answer}</div>
+                      </li>
+                    </>
+                  ))}
+                {initialQuestions &&
+                  initialQuestions?.map((item) => (
+                    // initial question ( right ) ( white bg )
+                    <li className="cursor" onClick={() => selectQuestion(item)}>
+                      <div className="message my-message">{item.question}</div>
+                    </li>
+                  ))}
               </ul>
             </div>
           </div>

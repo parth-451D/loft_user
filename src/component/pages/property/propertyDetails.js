@@ -204,23 +204,22 @@ const PropertyDetails = () => {
                 <p>{unitData?.description}</p>
               </div>
               <div className="mt-3 comman-blog-header">
-                <p>Rooms & beds</p>
+                <p>Bedrooms & Bathrooms</p>
               </div>
               <div className="grid grid-cols-12 gap-4 top">
                 <div className="col-span-12 lg:col-span-6">
-                  <div className="comman-blue-font">
+                  {/* <div className="comman-blue-font">
                     <p>
-                      Bedrooms: {unitData?.bedrooms} (Sleeps:{" "}
-                      {unitData?.bedrooms * 2})
+                      Bedrooms: {unitData?.bedrooms} 
                     </p>
-                  </div>
+                  </div> */}
                   <div className="flex mt-2">
                     <div className="property-box">
                       <div className="comman-grey">
-                        <p>Bedroom {unitData?.bedrooms}</p>
+                        <p>Bedroom : {unitData?.bedrooms}</p>
                       </div>
                       <div className="comman-grey mt-3">
-                        <p>Bunk | King bed</p>
+                        <p>Bunk | King Bed</p>
                       </div>
                       <div className="comman-grey mt-3">
                         <svg
@@ -248,16 +247,16 @@ const PropertyDetails = () => {
                   </div>
                 </div>
                 <div className="col-span-12 lg:col-span-6">
-                  <div className="comman-blue-font">
+                  {/* <div className="comman-blue-font">
                     <p>Bathrooms: </p>
-                  </div>
+                  </div> */}
                   <div className="flex mt-2">
                     <div className="property-box">
                       <div className="comman-grey">
-                        <p>Bathroom {unitData?.bathrooms}</p>
+                        <p>Bathroom : {unitData?.bathrooms}</p>
                       </div>
                       <div className="comman-grey mt-3">
-                        <p>Toilet | shower</p>
+                        <p>Toilet | Shower</p>
                       </div>
                       <div className="comman-grey mt-3 flex">
                         <svg
@@ -309,7 +308,7 @@ const PropertyDetails = () => {
                 </div>
               </div>
               <div className="mt-3 comman-blog-header">
-                <p>Rooms & beds:</p>
+                <p>Layout / Floor Plan:</p>
               </div>
               <div className="image mt-3">
                 <img
@@ -334,11 +333,11 @@ const PropertyDetails = () => {
                     </div>
                     <div className="comman-grey mt-2">
                       <DatePicker
+                        className="cursor"
                         selected={checkInDate}
                         onChange={handleCheckInChange}
                         placeholderText="Check-in"
                         dateFormat="dd/MM/yyyy"
-                        // showIcon
                         minDate={new Date()}
                       />
                     </div>
@@ -347,8 +346,9 @@ const PropertyDetails = () => {
                     <div className="comman-grey">
                       <p>Check-out</p>
                     </div>
-                    <div className="comman-grey mt-2">
+                    <div className="comman-grey mt-2 cursor">
                       <DatePicker
+                        className="cursor"
                         selected={checkOutDate}
                         onChange={handleCheckOutChange}
                         placeholderText="Check-out"
@@ -365,16 +365,16 @@ const PropertyDetails = () => {
                 <div className="flex justify-between items-center mt-3">
                   <div className="comman-grey">
                     <p>
-                      ${" "}
+                      $
                       {unitData?.newPrice
                         ? unitData?.newPrice
                         : unitData?.price}
-                      * {diffInDays} Days
+                      {" "} * {diffInDays} Days
                     </p>
                   </div>
                   <div className="comman-grey mt-2">
                     <p>
-                      ${" "}
+                      $
                       {unitData?.newPrice
                         ? unitData?.newPrice * diffInDays
                         : unitData?.price * diffInDays}
