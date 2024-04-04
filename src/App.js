@@ -27,6 +27,7 @@ import Contact from "./component/pages/contact us/contact";
 import EditProfile from "./component/pages/edit profile/editProfile";
 import UnitDetails from "./component/pages/Units/unit-details";
 import Chat from "./component/pages/chat/chat";
+import NewChat from "./component/pages/chat/newChat";
 
 const App = () => {
   return (
@@ -76,7 +77,8 @@ const AppContent = () => {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/chat" element={<Chat />} />
       </Routes>
-      <Chat />
+      {/* <Chat /> */}
+      <NewChat />
       {!isExcludedRoute() && <Footer />}
     </div>
   );
